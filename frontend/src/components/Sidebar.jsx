@@ -7,6 +7,8 @@ import { ChatContext } from '../../context/ChatContext.jsx';
 function Sidebar() {
   const { getUsers, users, selectedUser, setSelectedUser, unseenMessages, setUnseenMessages } = useContext(ChatContext)
 
+  const [showOption, setShowOption] = useState(false)
+
   const { logout, onlineUsers } = useContext(AuthContext)
 
   const [input, setInput] = useState(false)
@@ -25,8 +27,8 @@ function Sidebar() {
         <div className='flex justify-between items-center'>
           <img src={assets.logo} alt="logo" className='max-w-40' />
           <div className='relative py-2 group'>
-            <img src={assets.menu_icon} alt="menu" className='max-h-5 cursor-pointer' />
-            <div className='top-full absolute right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block active:block'>
+            <img onClick={()=> setShowOption(prev => !prev)} src={assets.menu_icon} alt="menu" className='max-h-5 cursor-pointer' />
+            <div className={`top-full absolute right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 md:group-hover:block ${showOption ? '' : 'hidden'}`}>
               <p onClick={() => navigate('/profile')} className='cursor-pointer text-sm'>Edit Profile</p>
               <hr className='my-2 border-t border-gray-500' />
               <p onClick={() => logout()} className='cursor-pointer text-sm'>Logout</p>
