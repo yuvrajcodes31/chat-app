@@ -70,6 +70,23 @@ export const AuthProvider = ({ children }) => {
         socket.disconnect();
     }
 
+    // Change Password
+
+    const changePassword = async (body)=>{
+        try {
+            console.log(body)
+            const {data} = await axios.put("/api/auth/change-password", body);
+            if (data.success){
+                setAuthUser(data.user)
+                toast.success("Password Updated successfully")
+            }
+            else {
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
 
     // Update profile function to handle user profile updates
 
@@ -121,7 +138,7 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         updateProfile,
-        
+        changePassword,
 
     }
 

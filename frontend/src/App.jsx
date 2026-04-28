@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import {Toaster} from "react-hot-toast"
 import { AuthContext } from '../context/AuthContext.jsx'
+import ChangePassword from './pages/ChangePassword.jsx'
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path='/' element={authUser ? <HomePage /> : <Navigate to="/login" />} />
         <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        <Route path='/change-password' element={<ChangePassword />} />
       </Routes>
     </div>
   )

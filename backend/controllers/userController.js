@@ -27,24 +27,24 @@ export const signup = async (req, res) => {
 
         const token = generateToken(newUser._id)
 
-        res.json({success: true, userData: newUser, token, message: "Account created Successfully"})
+        res.json({ success: true, userData: newUser, token, message: "Account created Successfully" })
 
     }
     catch (error) {
         console.log(error.message)
-        res.json({success: false, message: error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
 // Controller to login a user
 
-export const login = async(req, res) => {
+export const login = async (req, res) => {
     try {
-        const {email, password} = req.body;
-        const userData = await User.findOne({email});
+        const { email, password } = req.body;
+        const userData = await User.findOne({ email });
         const isPasswordCorrect = await bcrypt.compare(password, userData.password);
 
-        if (!isPasswordCorrect){
+        if (!isPasswordCorrect) {
             return res.json({
                 success: false,
                 message: "Invalid credentials"
@@ -52,42 +52,69 @@ export const login = async(req, res) => {
         }
         const token = generateToken(userData._id)
 
-        res.json({success: true, userData, token, message: "Logged In"})
+        res.json({ success: true, userData, token, message: "Logged In" })
 
     } catch (error) {
         console.log(error.message)
-        res.json({success: false, message: error.message})
+        res.json({ success: false, message: error.message })
     }
 }
 
 // Controller to check if user is authenticated
 
 export const checkAuth = (req, res) => {
-    res.json({success: true, user: req.user})
+    res.json({ success: true, user: req.user })
 }
 
 // Controller to update user profile details
 
-export const updateProfile = async(req, res)=> {
+export const updateProfile = async (req, res) => {
     try {
-        const { profilePic, bio, fullName} = req.body;
-        console.log(req.user);
+        const { profilePic, bio, fullName } = req.body;
 
         const userId = req.user._id;
 
         let updatedUser;
 
-        if(!profilePic){
-            updatedUser = await User.findByIdAndUpdate(userId, {bio, fullName}, {new: true}).select("-password");
+        if (!profilePic) {
+            updatedUser = await User.findByIdAndUpdate(userId, { bio, fullName }, { new: true }).select("-password");
         } else {
             console.log(profilePic)
             const upload = await cloudinary.uploader.upload(profilePic);
             console.log(upload)
-            updatedUser = await User.findByIdAndUpdate(userId, {profilePic: upload.secure_url, bio, fullName}, {new:true}).select("-password");
+            updatedUser = await User.findByIdAndUpdate(userId, { profilePic: upload.secure_url, bio, fullName }, { new: true }).select("-password");
         }
 
-        return res.json({success: true, user: updatedUser})
+        return res.json({ success: true, user: updatedUser })
     } catch (error) {
-        return res.json({success: false, message: error.message})
+        return res.json({ success: false, message: error.message })
+    }
+}
+
+export const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        
+        const userId = req.user._id;
+        console.log(userId)
+        const userData = await User.findById(userId)
+        console.log(userData)
+        const isPasswordCorrect = await bcrypt.compare(currentPassword, userData.password);
+        console.log(isPasswordCorrect)
+        if (!isPasswordCorrect) {
+            return res.json({
+                success: false,
+                message: "Invalid credentials"
+            })
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt)
+
+        const updatedUser = await User.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true }).select("-password");
+
+        return res.json({ success: true, user: updatedUser })
+
+    } catch (error) {
+        return res.json({ success: false, message: "Unable to change password" })
     }
 }
