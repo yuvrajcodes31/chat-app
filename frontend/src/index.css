@@ -8,3 +8,27 @@
 ::-webkit-scrollbar{
   display: none;
 }
+/* @utility custom-scrollbar {
+  &::-webkit-scrollbar { width: 8px; }
+  &::-webkit-scrollbar-track { background: #f1f1f1; }
+  &::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
+} */
+/* Re-enable scrollbar only here */
+.show-scrollbar {
+  scrollbar-width: 8px;
+}
+
+.show-scrollbar::-webkit-scrollbar {
+  display: block;
+  height: 10px;   /* horizontal */
+  width: 10px;    /* vertical if needed */
+}
+
+.show-scrollbar::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 9999px;
+}
+
+.show-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}

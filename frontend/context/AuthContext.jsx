@@ -1,8 +1,8 @@
 import { createContext, useEffect, useState } from "react";
-import axios from "axios";
+import axios, { all } from "axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 
 
 
@@ -19,6 +19,8 @@ export const AuthProvider = ({ children }) => {
     const [authUser, setAuthUser] = useState(null);
     const [onlineUsers, setOnlineUsers] = useState([]);
     const [socket, setSocket] = useState(null);
+    const [allUsers, setAllUsers] = useState([])
+    const [pageCursor, setPageCursor] = useState()
     
 
     // Check if user is authenticated and if so, set the user data and connect the socket
@@ -119,6 +121,42 @@ export const AuthProvider = ({ children }) => {
         })
     }
 
+    // Admin Dashboard 
+    const getAdminData = async (cursorId = null)=>{
+        try {
+            const {data} = await axios.get('/api/admin/all-users', {
+                params: {
+                    cursorId : cursorId
+                }
+            })
+            console.log(data)
+            if(data.success){
+                
+                setAllUsers([...allUsers, ...data.users])
+                
+                    setPageCursor(data.nextCursor)
+                
+            }else{
+                toast.error(data.message)
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    const deleteUser = async (userId) => {
+        try {
+            const { data } = await axios.delete(`/api/admin/delete-user/${userId}`)
+            if(data.success){
+                setAllUsers(allUsers.filter(user => user._id !== userId))
+                toast.success("User Deleted")
+            }
+        } catch (error) {
+            toast.error(error.message)
+        }
+    }
+
+    
 
 
     useEffect(() => {
@@ -127,6 +165,7 @@ export const AuthProvider = ({ children }) => {
             
         }
         checkAuth();
+        getAdminData();
     }, [])
 
 
@@ -139,7 +178,11 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         changePassword,
-
+        getAdminData, 
+        allUsers,
+        deleteUser,
+        pageCursor,
+        isAdmin : authUser?.role === 'admin'
     }
 
     return (

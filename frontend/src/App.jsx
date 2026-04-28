@@ -6,10 +6,11 @@ import ProfilePage from './pages/ProfilePage.jsx'
 import {Toaster} from "react-hot-toast"
 import { AuthContext } from '../context/AuthContext.jsx'
 import ChangePassword from './pages/ChangePassword.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 
 
 function App() {
-  const { authUser } = useContext(AuthContext);
+  const { authUser, isAdmin } = useContext(AuthContext);
   return (
     <div className="bg-[url('/bgImage.svg')] bg-cover bg-no-repeat bg-center ">
       <Toaster />
@@ -18,6 +19,7 @@ function App() {
         <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
         <Route path='/change-password' element={<ChangePassword />} />
+        <Route path='/admin' element={isAdmin ? <AdminDashboard /> : <Navigate to='/' /> }/>
       </Routes>
     </div>
   )
